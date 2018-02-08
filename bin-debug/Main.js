@@ -153,11 +153,14 @@ var Main = (function (_super) {
      * Create a game scene
      */
     Main.prototype.createGameScene = function () {
+        console.log(this.imgItem);
         var gamePic = this.createBitmapByName("game_jpg");
         console.log(gamePic);
         this.addChild(gamePic);
         var stageW = this.stage.stageWidth;
         var stageH = this.stage.stageHeight;
+        var imgWidth = gamePic.width;
+        var imgHeight = gamePic.height;
         gamePic.width = stageW * 0.3;
         gamePic.height = stageW * 0.3;
         gamePic.x = stageW - gamePic.width;
@@ -165,7 +168,7 @@ var Main = (function (_super) {
         var texture = gamePic.texture;
         //使用 RenderTexture 进行显示
         var renderTexture = new egret.RenderTexture();
-        renderTexture.drawToTexture(new egret.Bitmap(texture), new egret.Rectangle(1, 513, 111, 853));
+        renderTexture.drawToTexture(new egret.Bitmap(texture), new egret.Rectangle(0, 0, imgWidth * 0.3, imgWidth * 0.3));
         //将绘制好的 RenderTexture 进行显示
         var gamePicItem = new egret.Bitmap(renderTexture);
         this.addChild(gamePicItem);

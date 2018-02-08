@@ -94,12 +94,13 @@ class Main extends egret.DisplayObjectContainer {
 
     private textfield: egret.TextField;
 
+    private imgItem: egret.Bitmap[]
     /**
      * 创建游戏场景
      * Create a game scene
      */
     private createGameScene() {
-        
+        console.log(this.imgItem)
         let gamePic = this.createBitmapByName("game_jpg");
         console.log(gamePic);
         this.addChild(gamePic);
@@ -117,7 +118,7 @@ class Main extends egret.DisplayObjectContainer {
 
          //使用 RenderTexture 进行显示
         var renderTexture:egret.RenderTexture = new egret.RenderTexture();
-        renderTexture.drawToTexture(new egret.Bitmap(texture), new 	egret.Rectangle(1,513,111,853));
+        renderTexture.drawToTexture(new egret.Bitmap(texture), new 	egret.Rectangle(0,0,imgWidth*0.3,imgWidth*0.3));
 
         //将绘制好的 RenderTexture 进行显示
         var gamePicItem:egret.Bitmap = new egret.Bitmap(renderTexture);
