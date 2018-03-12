@@ -105,12 +105,15 @@ var Main = (function (_super) {
                     case 1:
                         _a.sent();
                         this.createGameScene();
-                        return [4 /*yield*/, RES.getResAsync("description_json")];
+                        return [4 /*yield*/, RES.getResAsync("description_json")
+                            // this.startAnimation(result);
+                        ];
                     case 2:
                         result = _a.sent();
-                        this.startAnimation(result);
+                        // this.startAnimation(result);
                         return [4 /*yield*/, platform.login()];
                     case 3:
+                        // this.startAnimation(result);
                         _a.sent();
                         return [4 /*yield*/, platform.getUserInfo()];
                     case 4:
@@ -154,65 +157,50 @@ var Main = (function (_super) {
      */
     Main.prototype.createGameScene = function () {
         console.log(this.imgItem);
-        var gamePic = this.createBitmapByName("game_jpg");
-        console.log(gamePic);
+        var gamePic = this.createBitmapByName("game1_jpg");
+        /*
+         *添加一个缩略图
+        */
         this.addChild(gamePic);
         var stageW = this.stage.stageWidth;
         var stageH = this.stage.stageHeight;
-        var imgWidth = gamePic.width;
-        var imgHeight = gamePic.height;
-        gamePic.width = stageW * 0.3;
-        gamePic.height = stageW * 0.3;
+        this.imgWidth = gamePic.width;
+        this.imgHeight = gamePic.height;
+        gamePic.width = Math.floor(stageW / 3);
+        gamePic.height = Math.floor(stageW / 3);
         gamePic.x = stageW - gamePic.width;
         gamePic.y = stageH - gamePic.height;
+        // 添加缩略图end
         var texture = gamePic.texture;
+        var list = this.cropImage(texture);
+        for (var i = 0; i < list.length; i++) {
+            list[i].texture.x = Math.floor(this.imgWidth / 3) * (i % 3);
+            list[i].texture.y = Math.floor(this.imgWidth / 3) * Math.floor(i / 3);
+            this.addChild(list[i].texture);
+        }
+    };
+    /**
+     * 生成拼图切块
+     *
+     */
+    Main.prototype.cropImage = function (texture) {
         //使用 RenderTexture 进行显示
-        var renderTexture = new egret.RenderTexture();
-        renderTexture.drawToTexture(new egret.Bitmap(texture), new egret.Rectangle(0, 0, imgWidth * 0.3, imgWidth * 0.3));
-        //将绘制好的 RenderTexture 进行显示
-        var gamePicItem = new egret.Bitmap(renderTexture);
-        this.addChild(gamePicItem);
-        // gamePicItem.width = stageW*0.3;
-        // gamePicItem.height = stageW*0.3;
-        gamePicItem.x = 100;
-        gamePicItem.y = 100;
-        var topMask = new egret.Shape();
-        topMask.graphics.beginFill(0x000000, 0.5);
-        topMask.graphics.drawRect(0, 0, stageW, 172);
-        topMask.graphics.endFill();
-        topMask.y = 33;
-        this.addChild(topMask);
-        var icon = this.createBitmapByName("egret_icon_png");
-        this.addChild(icon);
-        icon.x = 26;
-        icon.y = 33;
-        var line = new egret.Shape();
-        line.graphics.lineStyle(2, 0xffffff);
-        line.graphics.moveTo(0, 0);
-        line.graphics.lineTo(0, 117);
-        line.graphics.endFill();
-        line.x = 172;
-        line.y = 61;
-        this.addChild(line);
-        var colorLabel = new egret.TextField();
-        colorLabel.textColor = 0xffffff;
-        colorLabel.width = stageW - 172;
-        colorLabel.textAlign = "center";
-        colorLabel.text = "Hello Egret";
-        colorLabel.size = 24;
-        colorLabel.x = 172;
-        colorLabel.y = 80;
-        this.addChild(colorLabel);
-        var textfield = new egret.TextField();
-        this.addChild(textfield);
-        textfield.alpha = 0;
-        textfield.width = stageW - 172;
-        textfield.textAlign = egret.HorizontalAlign.CENTER;
-        textfield.size = 24;
-        textfield.textColor = 0xffffff;
-        textfield.x = 172;
-        textfield.y = 135;
-        this.textfield = textfield;
+        console.log(texture);
+        var picList = [];
+        for (var i = 0; i < 8; i++) {
+            // renderTexture不能在外部声明，否则会导致drawToTexture重复使用结果不符合预期
+            var renderTexture = new egret.RenderTexture();
+            console.log(this.imgWidth * 0.333 * (i % 3), this.imgWidth * 0.333 * Math.floor(i / 3), this.imgWidth * 0.333, this.imgWidth * 0.333);
+            renderTexture.drawToTexture(new egret.Bitmap(texture), new egret.Rectangle(this.imgWidth * 0.333 * (i % 3), this.imgWidth * 0.333 * Math.floor(i / 3), this.imgWidth * 0.333, this.imgWidth * 0.333));
+            //将绘制好的 RenderTexture 进行显示
+            var gamePicItem = new egret.Bitmap(renderTexture);
+            picList.push({
+                imgIndex: i,
+                texture: gamePicItem
+            });
+        }
+        // this.addChild(picList[1].texture)
+        return picList;
     };
     /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
@@ -234,6 +222,7 @@ var Main = (function (_super) {
         var parser = new egret.HtmlTextParser();
         var textflowArr = result.map(function (text) { return parser.parse(text); });
         var textfield = this.textfield;
+        console.log(textfield, textflowArr);
         var count = -1;
         var change = function () {
             count++;

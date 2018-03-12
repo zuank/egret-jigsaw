@@ -69,7 +69,7 @@ class Main extends egret.DisplayObjectContainer {
         await this.loadResource()
         this.createGameScene();
         const result = await RES.getResAsync("description_json")
-        this.startAnimation(result);
+        // this.startAnimation(result);
         await platform.login();
         const userInfo = await platform.getUserInfo();
         console.log(userInfo);
@@ -95,83 +95,69 @@ class Main extends egret.DisplayObjectContainer {
     private textfield: egret.TextField;
 
     private imgItem: egret.Bitmap[]
+
+    private imgWidth
+    private imgHeight
     /**
      * 创建游戏场景
      * Create a game scene
      */
     private createGameScene() {
         console.log(this.imgItem)
-        let gamePic = this.createBitmapByName("game_jpg");
-        console.log(gamePic);
+        let gamePic = this.createBitmapByName("game1_jpg");
+        /*
+         *添加一个缩略图 
+        */
         this.addChild(gamePic);
         let stageW = this.stage.stageWidth;
         let stageH = this.stage.stageHeight;
-        let imgWidth = gamePic.width
-        let imgHeight = gamePic.height
+        this.imgWidth = gamePic.width
+        this.imgHeight = gamePic.height
 
-        gamePic.width = stageW*0.3;
-        gamePic.height = stageW*0.3;
+        gamePic.width = Math.floor(stageW/3);
+        gamePic.height = Math.floor(stageW/3);
         gamePic.x = stageW - gamePic.width;
         gamePic.y = stageH - gamePic.height;
 
-        let texture = gamePic.texture
+        // 添加缩略图end
 
+        let texture: any = gamePic.texture
+        
+        let list = this.cropImage(texture)
+
+        for(let i = 0; i < list.length; i++){
+            list[i].texture.x = Math.floor(this.imgWidth/3)*(i%3)
+            list[i].texture.y = Math.floor(this.imgWidth/3)*Math.floor(i/3)
+            this.addChild(list[i].texture)
+        }
+
+    }
+
+    /**
+     * 生成拼图切块
+     * 
+     */
+
+    private cropImage (texture: egret.RenderTexture) {
          //使用 RenderTexture 进行显示
-        var renderTexture:egret.RenderTexture = new egret.RenderTexture();
-        renderTexture.drawToTexture(new egret.Bitmap(texture), new 	egret.Rectangle(0,0,imgWidth*0.3,imgWidth*0.3));
-
-        //将绘制好的 RenderTexture 进行显示
-        var gamePicItem:egret.Bitmap = new egret.Bitmap(renderTexture);
-        this.addChild(gamePicItem);
-        // gamePicItem.width = stageW*0.3;
-        // gamePicItem.height = stageW*0.3;
-        gamePicItem.x = 100;
-        gamePicItem.y = 100;
-
-        let topMask = new egret.Shape();
-        topMask.graphics.beginFill(0x000000, 0.5);
-        topMask.graphics.drawRect(0, 0, stageW, 172);
-        topMask.graphics.endFill();
-        topMask.y = 33;
-        this.addChild(topMask);
-
-        let icon = this.createBitmapByName("egret_icon_png");
-        this.addChild(icon);
-        icon.x = 26;
-        icon.y = 33;
-
-        let line = new egret.Shape();
-        line.graphics.lineStyle(2, 0xffffff);
-        line.graphics.moveTo(0, 0);
-        line.graphics.lineTo(0, 117);
-        line.graphics.endFill();
-        line.x = 172;
-        line.y = 61;
-        this.addChild(line);
-
-
-        let colorLabel = new egret.TextField();
-        colorLabel.textColor = 0xffffff;
-        colorLabel.width = stageW - 172;
-        colorLabel.textAlign = "center";
-        colorLabel.text = "Hello Egret";
-        colorLabel.size = 24;
-        colorLabel.x = 172;
-        colorLabel.y = 80;
-        this.addChild(colorLabel);
-
-        let textfield = new egret.TextField();
-        this.addChild(textfield);
-        textfield.alpha = 0;
-        textfield.width = stageW - 172;
-        textfield.textAlign = egret.HorizontalAlign.CENTER;
-        textfield.size = 24;
-        textfield.textColor = 0xffffff;
-        textfield.x = 172;
-        textfield.y = 135;
-        this.textfield = textfield;
-
-
+        console.log(texture);
+        let picList: Array<any>= []
+        for(let i = 0; i < 8;i++){
+            // renderTexture不能在外部声明，否则会导致drawToTexture重复使用结果不符合预期
+            var renderTexture:egret.RenderTexture = new egret.RenderTexture();
+            console.log(this.imgWidth*0.333*(i%3),this.imgWidth*0.333*Math.floor(i / 3),this.imgWidth*0.333,this.imgWidth*0.333)
+            renderTexture.drawToTexture(
+                new egret.Bitmap(texture), new 	egret.Rectangle(this.imgWidth*0.333*(i%3),this.imgWidth*0.333*Math.floor(i / 3),this.imgWidth*0.333,this.imgWidth*0.333)
+            );
+            //将绘制好的 RenderTexture 进行显示
+            var gamePicItem:egret.Bitmap = new egret.Bitmap(renderTexture);
+            picList.push({
+                imgIndex: i,
+                texture: gamePicItem
+            })
+        }
+        // this.addChild(picList[1].texture)
+        return picList;
     }
 
     /**
@@ -195,6 +181,7 @@ class Main extends egret.DisplayObjectContainer {
 
         let textflowArr = result.map(text => parser.parse(text));
         let textfield = this.textfield;
+        console.log(textfield,textflowArr)
         let count = -1;
         let change = () => {
             count++;

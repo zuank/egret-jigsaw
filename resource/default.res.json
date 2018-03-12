@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "bg_jpg,egret_icon_png,description_json,game_jpg",
+			"keys": "bg_jpg,egret_icon_png,description_json,game1_jpg",
 			"name": "preload"
 		}
 	],
@@ -22,9 +22,9 @@
 			"url": "config/description.json"
 		},
 		{
-			"name": "game_jpg",
+			"name": "game1_jpg",
 			"type": "image",
-			"url": "assets/game.jpg"
+			"url": "assets/game1.jpg"
 		}
 	]
 }
