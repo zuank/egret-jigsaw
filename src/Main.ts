@@ -98,6 +98,8 @@ class Main extends egret.DisplayObjectContainer {
 
     private imgWidth
     private imgHeight
+    private this.baseWidth
+    private baseHeight
     /**
      * 创建游戏场景
      * Create a game scene
@@ -114,6 +116,9 @@ class Main extends egret.DisplayObjectContainer {
         this.imgWidth = gamePic.width
         this.imgHeight = gamePic.height
 
+        this.baseWidth = Math.floor(this.imgWidth/3)
+        this.baseHeight = Math.floor(this.imgHeight/3)
+
         gamePic.width = Math.floor(stageW/3);
         gamePic.height = Math.floor(stageW/3);
         gamePic.x = stageW - gamePic.width;
@@ -126,8 +131,8 @@ class Main extends egret.DisplayObjectContainer {
         let list = this.cropImage(texture)
 
         for(let i = 0; i < list.length; i++){
-            list[i].texture.x = Math.floor(this.imgWidth/3)*(i%3)
-            list[i].texture.y = Math.floor(this.imgWidth/3)*Math.floor(i/3)
+            list[i].texture.x = this.baseWidth*(i%3)
+            list[i].texture.y = this.baseHeight*Math.floor(i/3)
             this.addChild(list[i].texture)
         }
 
@@ -145,9 +150,8 @@ class Main extends egret.DisplayObjectContainer {
         for(let i = 0; i < 8;i++){
             // renderTexture不能在外部声明，否则会导致drawToTexture重复使用结果不符合预期
             var renderTexture:egret.RenderTexture = new egret.RenderTexture();
-            console.log(this.imgWidth*0.333*(i%3),this.imgWidth*0.333*Math.floor(i / 3),this.imgWidth*0.333,this.imgWidth*0.333)
             renderTexture.drawToTexture(
-                new egret.Bitmap(texture), new 	egret.Rectangle(this.imgWidth*0.333*(i%3),this.imgWidth*0.333*Math.floor(i / 3),this.imgWidth*0.333,this.imgWidth*0.333)
+                new egret.Bitmap(texture), new 	egret.Rectangle(this.baseWidth*(i%3),this.baseHeight*Math.floor(i / 3),this.baseWidth,this.baseHeight)
             );
             //将绘制好的 RenderTexture 进行显示
             var gamePicItem:egret.Bitmap = new egret.Bitmap(renderTexture);
