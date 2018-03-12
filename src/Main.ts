@@ -98,7 +98,7 @@ class Main extends egret.DisplayObjectContainer {
 
     private imgWidth
     private imgHeight
-    private this.baseWidth
+    private baseWidth
     private baseHeight
     /**
      * 创建游戏场景
